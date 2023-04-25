@@ -1,6 +1,7 @@
 import { IonButton, IonIcon } from '@ionic/react';
 import { play, pause, playSkipBackCircle, playSkipForwardCircle } from 'ionicons/icons';
 import {useRef, useState} from "react";
+import './AudioPlayer.css';
 
 const AudioPlayer = ({ message, source }) => {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -10,29 +11,41 @@ const AudioPlayer = ({ message, source }) => {
     const audioRef = useRef(null);
 
     const togglePlay = () => {
-        if (!isPlaying) {
-            audioRef.current.play();
-            setIsPlaying(true);
-        } else {
-            audioRef.current.pause();
+        const audio = audioRef.current;
+
+        if (!audio) {
+            return;
+        }
+
+        if (isPlaying) {
+            audio.pause();
             setIsPlaying(false);
+        } else {
+            audio.play();
+            setIsPlaying(true);
         }
     };
 
-    const handleLoadedData = () => {
-        setDuration(audioRef.current.duration);
-    };
-
     const handleTimeUpdate = () => {
-        setCurrentTime(audioRef.current.currentTime);
+        const audio = audioRef.current;
+
+        if (!audio) {
+            return;
+        }
+
+        setCurrentTime(audio.currentTime);
     };
 
-    const handleFastForward = () => {
-        audioRef.current.currentTime += 15;
-    };
+    const handleSeek = (seconds: number) => {
+        const audio = audioRef.current;
 
-    const handleRewind = () => {
-        audioRef.current.currentTime -= 15;
+        if (!audio) {
+            return;
+        }
+
+        const newTime = Math.max(0, Math.min(audio.duration, currentTime + seconds));
+        setCurrentTime(newTime);
+        audio.currentTime = newTime;
     };
 
     return (
@@ -42,21 +55,28 @@ const AudioPlayer = ({ message, source }) => {
                 <audio
                     ref={audioRef}
                     src={source}
-                    onLoadedData={handleLoadedData}
                     onTimeUpdate={handleTimeUpdate}
                 />
+
                 <div className="buttons-container">
-                    <IonButton onClick={handleRewind}>
+                    <IonButton onClick={() => handleSeek(-15)}>
                         <IonIcon slot="icon-only" icon={playSkipBackCircle} />
                     </IonButton>
                     <IonButton onClick={togglePlay}>
                         <IonIcon slot="icon-only" icon={isPlaying ? pause : play} />
                     </IonButton>
-                    <IonButton onClick={handleFastForward}>
+                    <IonButton onClick={() => handleSeek(15)}>
                         <IonIcon slot="icon-only" icon={playSkipForwardCircle} />
                     </IonButton>
                 </div>
+
+                <div className="ion-padding">
+                    <div className="progress-bar">
+                        <div className="progress-bar-fill" style={{ width: `${(currentTime / audioRef.current?.duration) * 100}%` }} />
+                    </div>
+                </div>
             </div>
+
         </div>
     );
 };

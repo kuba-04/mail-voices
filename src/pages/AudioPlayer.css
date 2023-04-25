@@ -7,3 +7,20 @@
 .buttons-container ion-button {
     margin: 0 10px;
 }
+
+.progress-bar {
+    height: 5px;
+    width: 100%;
+    background-color: #ccc;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 5px;
+    width: 50%;
+    background-color: #007bff;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+

@@ -23,37 +23,12 @@ import AudioPlayer from "./AudioPlayer";
 
 function ViewMessage() {
   const [message, setMessage] = useState<Message>();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const params = useParams<{ id: string }>();
 
   useIonViewWillEnter(() => {
     const msg = getMessage(parseInt(params.id, 10));
     setMessage(msg);
   });
-
-  const playAudio = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
-  const skipForward = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime += 15;
-    }
-  };
-
-  const skipBackward = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime -= 15;
-    }
-  };
 
   return (
       <IonPage id="view-message-page">
