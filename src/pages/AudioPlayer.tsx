@@ -48,6 +48,16 @@ const AudioPlayer = ({ message, source }) => {
         audio.currentTime = newTime;
     };
 
+    const handleLoadedMetadata = () => {
+        const audio = audioRef.current;
+
+        if (!audio) {
+            return;
+        }
+
+        setDuration(audio.duration);
+    };
+
     return (
         <div className="audio-player-container">
             <div className="ion-padding">
@@ -56,6 +66,7 @@ const AudioPlayer = ({ message, source }) => {
                     ref={audioRef}
                     src={source}
                     onTimeUpdate={handleTimeUpdate}
+                    onLoadedMetadata={handleLoadedMetadata}
                 />
 
                 <div className="buttons-container">
