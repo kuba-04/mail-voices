@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Message, getMessage } from '../data/messages';
+import { useRef, useState } from 'react';
 import {
   IonBackButton,
   IonButtons,
@@ -13,12 +12,18 @@ import {
   IonToolbar,
   useIonViewWillEnter,
 } from '@ionic/react';
-import { personCircle } from 'ionicons/icons';
-import { useParams } from 'react-router';
+import {personCircle, play, pause, playSkipForwardCircle, playSkipBackCircle} from 'ionicons/icons';
+// import { fastForwardOutline } from 'ionicons/icons/fast-forward-outline';
+
 import './ViewMessage.css';
+import sample from '../../resources/voices/file_example_MP3_700KB.mp3'
+import {getMessage, Message} from "../data/messages";
+import {useParams} from "react-router";
 
 function ViewMessage() {
   const [message, setMessage] = useState<Message>();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const params = useParams<{ id: string }>();
 
   useIonViewWillEnter(() => {
@@ -26,52 +31,78 @@ function ViewMessage() {
     setMessage(msg);
   });
 
-  return (
-    <IonPage id="view-message-page">
-      <IonHeader translucent>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton text="Inbox" defaultHref="/home"></IonBackButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+  const playAudio = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
 
-      <IonContent fullscreen>
-        {message ? (
-          <>
-            <IonItem>
-              <IonIcon aria-hidden="true" icon={personCircle} color="primary"></IonIcon>
-              <IonLabel className="ion-text-wrap">
-                <h2>
-                  {message.fromName}
-                  <span className="date">
+  const skipForward = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime += 15;
+    }
+  };
+
+  const skipBackward = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime -= 15;
+    }
+  };
+
+  return (
+      <IonPage id="view-message-page">
+        <IonHeader translucent>
+          <IonToolbar>
+            <IonButtons slot="start">
+              <IonBackButton text="Inbox" defaultHref="/home" />
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+
+        <IonContent fullscreen>
+          {message ? (
+              <>
+                <IonItem>
+                  <IonIcon aria-hidden="true" icon={personCircle} color="primary" />
+                  <IonLabel className="ion-text-wrap">
+                    <h2>
+                      {message.fromName}
+                      <span className="date">
                     <IonNote>{message.date}</IonNote>
                   </span>
-                </h2>
-                <h3>
-                  To: <IonNote>Me</IonNote>
-                </h3>
-              </IonLabel>
-            </IonItem>
+                    </h2>
+                    <h3>
+                      To: <IonNote>Me</IonNote>
+                    </h3>
+                  </IonLabel>
+                </IonItem>
 
-            <div className="ion-padding">
-              <h1>{message.subject}</h1>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </p>
-            </div>
-          </>
-        ) : (
-          <div>Message not found</div>
-        )}
-      </IonContent>
-    </IonPage>
+                <div className="ion-padding">
+                  <h1>{message.subject}</h1>
+                  <div className="audio-controls">
+                    <button onClick={skipBackward}>
+                      <IonIcon icon={playSkipBackCircle} />
+                    </button>
+                    <button onClick={playAudio}>
+                      <IonIcon icon={isPlaying ? pause : play} />
+                    </button>
+                    <button onClick={skipForward}>
+                      <IonIcon icon={playSkipForwardCircle} />
+                    </button>
+                  </div>
+                  <audio ref={audioRef} src={sample} />
+                </div>
+              </>
+          ) : (
+              <div>Message not found</div>
+          )}
+        </IonContent>
+      </IonPage>
   );
 }
 
