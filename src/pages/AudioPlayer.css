@@ -1,0 +1,9 @@
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttons-container ion-button {
+    margin: 0 10px;
+}

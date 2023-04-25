@@ -19,6 +19,7 @@ import './ViewMessage.css';
 import sample from '../../resources/voices/file_example_MP3_700KB.mp3'
 import {getMessage, Message} from "../data/messages";
 import {useParams} from "react-router";
+import AudioPlayer from "./AudioPlayer";
 
 function ViewMessage() {
   const [message, setMessage] = useState<Message>();
@@ -82,21 +83,8 @@ function ViewMessage() {
                   </IonLabel>
                 </IonItem>
 
-                <div className="ion-padding">
-                  <h1>{message.subject}</h1>
-                  <div className="audio-controls">
-                    <button onClick={skipBackward}>
-                      <IonIcon icon={playSkipBackCircle} />
-                    </button>
-                    <button onClick={playAudio}>
-                      <IonIcon icon={isPlaying ? pause : play} />
-                    </button>
-                    <button onClick={skipForward}>
-                      <IonIcon icon={playSkipForwardCircle} />
-                    </button>
-                  </div>
-                  <audio ref={audioRef} src={sample} />
-                </div>
+                <AudioPlayer message={message} source={sample} />
+
               </>
           ) : (
               <div>Message not found</div>
